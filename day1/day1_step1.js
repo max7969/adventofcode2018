@@ -3,8 +3,4 @@ const fs = require('fs');
 let rawdata = fs.readFileSync('./data.json');  
 let data = JSON.parse(rawdata);
 
-var frequency = 0;
-data.frequencies.forEach(element => {
-    frequency += element;
-});
-console.log(frequency);
+console.log(data.frequencies.reduce((a, b) => a + b, 0));
