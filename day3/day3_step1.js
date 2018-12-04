@@ -2,7 +2,7 @@ const fs = require('fs');
 
 let data = JSON.parse(fs.readFileSync('./data.json'));
 
-var computed = new Map();
+let computed = new Map();
 data.forEach(element => {
     let interestingPart = element.split('@')[1];
     let startingPos = interestingPart.split(':')[0];
