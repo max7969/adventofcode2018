@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let data = JSON.parse(fs.readFileSync('./day4/data.json'));
+let data = JSON.parse(fs.readFileSync('./data.json'));
 
 var sortData = (data) => {
     return data.map((value) => {
@@ -29,13 +29,13 @@ var extractGuardsData = (data) => {
             currentMinuteWakesUp = element.date.getMinutes();
             if (!guardsData.get(currentGuardId)) {
                 let minutesAsleep = new Array(60).fill(0);
-                for (let i=currentMinuteAsleep;i < currentMinuteWakesUp;i++) {
+                for (let i = currentMinuteAsleep; i < currentMinuteWakesUp; i++) {
                     minutesAsleep[i] = 1;
                 }
                 guardsData.set(currentGuardId, minutesAsleep);
             } else {
                 let minutesAsleep = guardsData.get(currentGuardId);
-                for (let i=currentMinuteAsleep;i < currentMinuteWakesUp;i++) {
+                for (let i = currentMinuteAsleep; i < currentMinuteWakesUp; i++) {
                     minutesAsleep[i] = minutesAsleep[i] + 1;
                 }
                 guardsData.set(currentGuardId, minutesAsleep);
@@ -55,7 +55,7 @@ var findGuardWithLaziestMinute = (guards) => {
 
             if (Math.max(...laziest[1]) < Math.max(...element[1])) {
                 laziest = element;
-            }  
+            }
         }
     };
     return laziest;
