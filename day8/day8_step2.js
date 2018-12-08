@@ -18,14 +18,14 @@ var createNode = (data) => {
     return node;
 }
 
-var computeMetadataSum = (node) => {
-    let sum = node.metadata.reduce((a, b) => a + b);
-    node.childs.forEach(child => {
-        sum += computeMetadataSum(child);
-    });
-    return sum;
+var computeNodeValue = (node) => {
+    if (node.childCount === 0) {
+        return node.metadata.reduce((a, b) => a + b);
+    }
+    return node.metadata.reduce((value, element) =>
+        node.childs[element - 1] ? value + computeNodeValue(node.childs[element - 1]) : value, 0);
 }
 
 let parentNode = createNode(data);
-let sum = computeMetadataSum(parentNode);
-console.log(sum);
+let value = computeNodeValue(parentNode);
+console.log(value);
