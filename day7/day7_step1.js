@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let data = JSON.parse(fs.readFileSync('./day7/data.json'));
+let data = JSON.parse(fs.readFileSync('./data.json'));
 
 var buildMapWithDependencies = (data) => {
     let dependencyMap = new Map();
