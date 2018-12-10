@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let data = JSON.parse(fs.readFileSync('./day9/data.json'));
+let data = JSON.parse(fs.readFileSync('./data.json'));
 
 var readRules = (data) => {
     let regexp = /([0-9]*)\ players\;\ last\ marble\ is\ worth\ ([0-9]*)\ points/;
