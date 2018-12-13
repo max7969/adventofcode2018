@@ -2,7 +2,7 @@ const fs = require('fs');
 
 let data = JSON.parse(fs.readFileSync('./data.json'));
 
-var extractMap = (data) => {
+var extractConfiguration = (data) => {
     let wagons = [];
     let rails = [];
     data.forEach((line, y) => {
@@ -93,5 +93,5 @@ var moveWagonsUntilCollision = (rails, wagons) => {
     return colisions[0];
 }
 
-let map = extractMap(data);
-console.log(moveWagonsUntilCollision(map.rails, map.wagons));
+let configuration = extractConfiguration(data);
+console.log(moveWagonsUntilCollision(configuration.rails, configuration.wagons));
