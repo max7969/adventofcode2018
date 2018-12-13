@@ -31,11 +31,6 @@ var sortWagons = (wagons) => {
     wagons.sort((a, b) => (a.y * 10 + a.x) - (b.y * 10 + b.x));
 }
 
-var getColisions = (wagons) => {
-    let coords = wagons.map(wagon => wagon.x + "," + wagon.y);
-    return coords.filter((coord, index) => coords.indexOf(coord) !== index);
-}
-
 var moveWagon = (wagon, rails) => {
     let rail = rails[wagon.y][wagon.x];
     if (rail === "-") {
@@ -78,20 +73,28 @@ var updatePosOnCross = (wagon) => {
     wagon.change++;
 }
 
-var moveWagonsUntilCollision = (rails, wagons) => {
-    let colisions = getColisions(wagons);
-    while (colisions.length === 0) {
+var getWagonsCrashed = (wagons) => {
+    let wagonsCrashed = [];
+    wagons.forEach(wagon => {
+        if (wagons.filter(current => current.x === wagon.x && current.y === wagon.y).length === 2) {
+            wagonsCrashed.push(wagon);
+        }
+    });
+    return wagonsCrashed;
+}
+
+var moveWagonsUntilOneLeft = (rails, wagons) => {
+    while (wagons.length > 1) {
         sortWagons(wagons);
         wagons.forEach(wagon => {
             moveWagon(wagon, rails);
-            colisions = getColisions(wagons);
-            if (colisions.length === 1) {
-                return colisions[0];
-            }
+            getWagonsCrashed(wagons).forEach(wagonToRemove => {
+                wagons = wagons.filter(current => (wagonToRemove.x !== current.x || wagonToRemove.y !== current.y));
+            });
         });
     }
-    return colisions[0];
+    return wagons[0];
 }
 
 let map = extractMap(data);
-console.log(moveWagonsUntilCollision(map.rails, map.wagons));
+console.log(moveWagonsUntilOneLeft(map.rails, map.wagons));
