@@ -90,9 +90,9 @@ var computeSumPlants = (state, remainIterationCount, initialState, indexDiff) =>
     let sum = 0;
     for (let i = 0; i < state.length; i++) {
         if (state[i] === "#") {
-            sum += index + remainIterationCount;
+            sum += index + (remainIterationCount * indexDiff);
         }
-        index += indexDiff;
+        index++;
     }
     return sum;
 }
