@@ -1,8 +1,9 @@
-let data = 320851;
+let data = "320851";
 
 function Node(value, next) {
     this.value = value;
     this.next = next;
+    this.prev = null;
 };
 
 function ChainedList(nodeA, nodeB) {
@@ -33,6 +34,7 @@ var rotate = (list, elfNumber) => {
 
 var addNode = (list, value) => {
     let newNode = new Node(value, null);
+    newNode.prev = list.tail;
     list.tail.next = newNode;
     list.tail = newNode;
     list.length++;
@@ -41,6 +43,7 @@ var addNode = (list, value) => {
 var initRecipes = () => {
     let nodeB = new Node(7, null);
     let nodeA = new Node(3, nodeB);
+    nodeB.prev = nodeA;
     return new ChainedList(nodeA, nodeB);
 }
 
@@ -54,28 +57,38 @@ var createNewRecipes = (list) => {
     }
 }
 
-var getTenNext = (list, countNeeded) => {
-    let current = list.head;
-    for (let i = 0; i < countNeeded; i++) {
-        current = current.next;
-    }
+var getLastSeven = (list) => {
     let str = "";
-    for (let i = 0; i < 10; i++) {
-        str = str.concat(current.value);
-        current = current.next;
+    let current = list.tail;
+    if (list.length > 7) {
+        for (let i = 0; i < 7; i++) {
+            str = str.concat(current.value);
+            current = current.prev;
+        }
+    }
+    return str.split("").reverse().join("");
+}
+
+var getChainStr = (list) => {
+    let str = "";
+    let node = list.head;
+    while (node) {
+        str = str.concat("" + node.value);
+        node = node.next;
     }
     return str;
 }
 
-var createRecipesUntilTheEnd = (nbRecipesNeeded) => {
+var createRecipesUntilTheEnd = (pattern) => {
     let list = initRecipes();
-    while (list.length <= nbRecipesNeeded + 10) {
+    let patternFound = false;
+    while (!patternFound) {
         createNewRecipes(list);
         rotate(list, 1);
         rotate(list, 2);
+        patternFound = getLastSeven(list).split(pattern).length > 1;
     }
-    return getTenNext(list, nbRecipesNeeded);
+    return getChainStr(list).split(pattern)[0].length;
 }
 
-console.log(createRecipesUntilTheEnd(data));
-
+console.log(createRecipesUntilTheEnd("320851"));
