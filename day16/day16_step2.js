@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 let data = JSON.parse(fs.readFileSync('./data.json'));
+let program = JSON.parse(fs.readFileSync('./program.json'));
 
 var addr = (input, instruction) => {
     let output = input;
@@ -130,27 +131,75 @@ var eqrr = (input, instruction) => {
     return output;
 }
 
-var countMatchingOperations = (input, instruction, output) => {
-    let operations = [addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr];
-    let count = 0;
-    operations.forEach(operation => {
-        let opOutput = operation(JSON.parse(JSON.stringify(input)), instruction);
-        if (opOutput.join('') === output.join('')) {
-            count++;
-        }
-    });
-    return count;
+var sortOperations = (operations, data) => {
+    let sortedOps = [];
+    for (let operation of operations) {
+        let countMatchingSample = 0;
+        data.forEach(sample => {
+            outOp = operation(JSON.parse(JSON.stringify(sample.before)), sample.exec);
+            if (outOp.join('') !== sample.after.join('')) {
+                countMatchingSample++;
+            }
+        });
+        sortedOps.push({ "operation": operation, "count": countMatchingSample });
+    }
+    sortedOps.sort((a, b) => a.count - b.count);
+    return sortedOps.map(sortedOp => sortedOp.operation);
 }
 
-var countInstructionsMatchingMultipleOperations = (data) => {
-    let count = 0;
-    data.forEach(config => {
-        let countMatchingOp = countMatchingOperations(config.before, config.exec, config.after);
-        if (countMatchingOp > 2) {
-            count++;
-        }
-    });
-    return count;
+var assignNumberToOperations = (data) => {
+    let operations = sortOperations([addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr], data);
+    let operationsMap = new Map();
+    for (let i = 0; i < 16; i++) {
+        let samples = data.filter(sample => sample.exec.startsWith(i + " "));
+        operations.forEach((operation, index) => {
+            let matchAllSamples = true;
+            samples.forEach(sample => {
+                outOp = operation(JSON.parse(JSON.stringify(sample.before)), sample.exec);
+                if (outOp.join('') !== sample.after.join('')) {
+                    matchAllSamples = false;
+                }
+            })
+            if (matchAllSamples) {
+                if (operationsMap.get(i)) {
+                    operationsMap.get(i).push(operation);
+                } else {
+                    operationsMap.set(i, [operation]);
+                }
+            }
+        });
+    }
+    return operationsMap;
 }
 
-console.log(countInstructionsMatchingMultipleOperations(data));
+var cleanMap = (operationsMap) => {
+    let cleanMap = new Map();
+    while (Array.from(cleanMap.values()).length < 16) {
+        for (let operation of operationsMap) {
+            if (operationsMap.get(operation[0]).length === 1) {
+                cleanMap.set(operation[0], operationsMap.get(operation[0])[0]);
+                operationsMap.delete(operation[0]);
+            }
+        }
+        for (let operation of operationsMap) {
+            for (let opClean of cleanMap) {
+                if (operationsMap.get(operation[0]).indexOf(cleanMap.get(opClean[0])) >= 0) {
+                    operationsMap.get(operation[0]).splice(operationsMap.get(operation[0]).indexOf(cleanMap.get(opClean[0])), 1);
+                }
+            }
+        }
+    }
+    return cleanMap;
+}
+
+var applyProgram = (program, data) => {
+    let operationsMap = cleanMap(assignNumberToOperations(data));
+    let value = [0, 0, 0, 0];
+    program.forEach(instruction => {
+        let operation = operationsMap.get(parseInt(instruction.split(' ')[0]));
+        value = operation(value, instruction);
+    });
+    return value;
+}
+
+console.log(applyProgram(program, data));
