@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let data = JSON.parse(fs.readFileSync('./day15/data.json'));
+let data = JSON.parse(fs.readFileSync('./data.json'));
 
 var readMap = (data, attack) => {
     let fighters = [];
